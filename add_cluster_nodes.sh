@@ -1,10 +1,8 @@
 #!/bin/bash
-CLUSTER_NAME=${CLUSTER_NAME:-Theistareykjarbunga}
-ETCD_HOST=${ETCD_HOST:-10.20.2.4:2379}
 
 ipaddr=$(hostname -i | awk ' { print $1 } ')
 
-for i in $(curl http://$ETCD_HOST/v2/keys/pxc-cluster/$CLUSTER_NAME/ | jq -r '.node.nodes[]?.key' | awk -F'/' '{print $(NF)}')
+for i in $(curl http://$DISCOVERY_SERVICE/v2/keys/pxc-cluster/$CLUSTER_NAME/ | jq -r '.node.nodes[]?.key' | awk -F'/' '{print $(NF)}')
 do
 	echo $i 
         mysql -h $i -uroot -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON *.* TO '$MYSQL_PROXY_USER'@'$ipaddr' IDENTIFIED BY '$MYSQL_PROXY_PASSWORD'"
